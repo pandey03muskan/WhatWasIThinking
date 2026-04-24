@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"TestProject/helpers"
-
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -119,8 +118,8 @@ func GetUser(c *gin.Context) {
 	}
 	fmt.Println("ID:", requestBody.ID)
 
-	userCollection := config.GetCollection("user")           //get user collection from DB
-	objectID, err := helpers.ObjectIDFromHex(requestBody.ID) // convert string ID to ObjectID
+	userCollection := config.GetCollection("user")             //get user collection from DB
+	objectID, err := primitive.ObjectIDFromHex(requestBody.ID) // convert string ID to ObjectID
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid ID"})
 		return

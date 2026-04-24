@@ -10,3 +10,8 @@ type CreateNoteRequestBody struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
+
+type UpdateNoteRequestBody struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
