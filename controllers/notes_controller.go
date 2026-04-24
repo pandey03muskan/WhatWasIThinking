@@ -4,7 +4,6 @@ import (
 	"TestProject/config"
 	"TestProject/models"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,8 +18,6 @@ func GetNotes(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
 		return
 	}
-
-	fmt.Println("User ID from query:", userId)
 	// convert string to ObjectID
 	objectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
@@ -88,9 +85,11 @@ func CreateNote(c *gin.Context) {
 	notesCollection := config.GetCollection("notes")
 	// create a new note for the user
 	_, err = notesCollection.InsertOne(c, gin.H{
-		"user_id": objectID,
-		"title":   NotesRequestBody.Title,
-		"content": NotesRequestBody.Content,
+		"user_id":    objectID,
+		"title":      NotesRequestBody.Title,
+		"content":    NotesRequestBody.Content,
+		"created_at": time.Now(),
+		"updated_at": time.Now(),
 	})
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to create note"})
@@ -164,27 +163,22 @@ func UpdateNote(c *gin.Context) {
 	}
 
 	// convert string to ObjectID
-	fmt.Println("userid :", userId)
 	noteObjectID, err := primitive.ObjectIDFromHex(note_id)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid note ID"})
 		return
 	}
-	fmt.Println("note object ID:", noteObjectID)
 	userObjectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
-		fmt.Println("")
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
 	}
-	fmt.Println("user object ID:", userObjectID)
 	// check if user exists
 	userCollection := config.GetCollection("user")
 	if err := userCollection.FindOne(ctx, gin.H{"_id": userObjectID}).Err(); err != nil {
 		c.JSON(404, gin.H{"error": "User not found"})
 		return
 	}
-	fmt.Println("note object ID:", noteObjectID)
 	var NotesRequestBody models.UpdateNoteRequestBody
 	if err := c.BindJSON(&NotesRequestBody); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})
@@ -199,8 +193,9 @@ func UpdateNote(c *gin.Context) {
 	notesCollection := config.GetCollection("notes")
 	res, err := notesCollection.UpdateOne(ctx, gin.H{"_id": noteObjectID, "user_id": userObjectID}, gin.H{
 		"$set": gin.H{
-			"title":   NotesRequestBody.Title,
-			"content": NotesRequestBody.Content,
+			"title":      NotesRequestBody.Title,
+			"content":    NotesRequestBody.Content,
+			"updated_at": time.Now(),
 		},
 	})
 	if err != nil {
