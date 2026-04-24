@@ -42,6 +42,6 @@ func main() {
 	}
 	log.Printf("Server is running on port %s", PORT) // Start the server
 	if err := router.Run(":" + PORT); err != nil {
-		log.Fatalf("Failed to run server: %v", err)
+		log.Println("No .env file found, using environment variables")
 	}
 }
