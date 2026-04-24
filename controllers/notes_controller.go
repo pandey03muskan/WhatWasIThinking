@@ -33,7 +33,7 @@ func GetNotes(c *gin.Context) {
 		return
 	}
 
-	var notes []models.GetNotes
+	var notes []models.Note
 	if err := res.All(c, &notes); err != nil {
 		c.JSON(500, gin.H{"error": "Failed to decode notes"})
 		return
