@@ -96,8 +96,8 @@ func DeleteNote(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	// taken user id and note id from query parameters
-	user_id := c.Param("user_id")
 	note_id := c.Param("note_id")
+	user_id := c.Param("user_id")
 
 	// convert string to ObjectID
 	userObjectID, err := primitive.ObjectIDFromHex(user_id)
@@ -108,8 +108,7 @@ func DeleteNote(c *gin.Context) {
 
 	// check if user exists
 	userCollection := config.GetCollection("user")
-	response := userCollection.FindOne(ctx, gin.H{"_id": userObjectID})
-	if response == nil {
+	if err := userCollection.FindOne(ctx, gin.H{"_id": userObjectID}).Err(); err != nil {
 		c.JSON(404, gin.H{"error": "User not found"})
 		return
 	}
@@ -144,23 +143,24 @@ func UpdateNote(c *gin.Context) {
 	note_id := c.Param("note_id")
 	user_id := c.Param("user_id")
 	// convert string to ObjectID
-	fmt.Println("userid noteis :", user_id, note_id)
+	fmt.Println("userid :", user_id)
+	noteObjectID, err := primitive.ObjectIDFromHex(note_id)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid note ID"})
+		return
+	}
+	fmt.Println("note object ID:", noteObjectID)
 	userObjectID, err := primitive.ObjectIDFromHex(user_id)
 	if err != nil {
+		fmt.Println("")
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
 	}
 	fmt.Println("user object ID:", userObjectID)
 	// check if user exists
 	userCollection := config.GetCollection("user")
-	response := userCollection.FindOne(ctx, gin.H{"_id": userObjectID})
-	if response == nil {
+	if err := userCollection.FindOne(ctx, gin.H{"_id": userObjectID}).Err(); err != nil {
 		c.JSON(404, gin.H{"error": "User not found"})
-		return
-	}
-	noteObjectID, err := primitive.ObjectIDFromHex(note_id)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid note ID"})
 		return
 	}
 	fmt.Println("note object ID:", noteObjectID)
