@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/itsjamie/gin-cors v0.0.0-20220228161158-ef28d3d2a0a8 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"TestProject/config"
+	"TestProject/helpers"
 	"TestProject/models"
 	"context"
 	"fmt"
@@ -100,6 +101,14 @@ func LoginUser(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Invalid password"})
 		return
 	}
+
+	// generate JWT token
+	token, err := helpers.GenerateJWT(user.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"status":  200,
 		"message": "Login successful",
@@ -107,6 +116,7 @@ func LoginUser(c *gin.Context) {
 			"id":    user.ID,
 			"email": user.Email,
 			"name":  user.Name,
+			"token": token,
 		},
 	})
 }
@@ -116,15 +126,21 @@ func GetUser(c *gin.Context) {
 	defer cancel()
 
 	// take ID from request body
-	var requestBody models.GetUserRequestBody
-	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+	// var requestBody models.GetUserRequestBody
+	// if err := c.BindJSON(&requestBody); err != nil {
+	// 	c.JSON(400, gin.H{"error": "Invalid request body"})
+	// 	return
+	// }
+	// fmt.Println("ID:", requestBody.ID)
+
+	userId, exists := c.Get("userID") // get userID from context set by auth middleware
+	if !exists {
+		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
 		return
 	}
-	fmt.Println("ID:", requestBody.ID)
 
-	userCollection := config.GetCollection("user")             //get user collection from DB
-	objectID, err := primitive.ObjectIDFromHex(requestBody.ID) // convert string ID to ObjectID
+	userCollection := config.GetCollection("user")              //get user collection from DB
+	objectID, err := primitive.ObjectIDFromHex(userId.(string)) // convert string ID to ObjectID
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid ID"})
 		return

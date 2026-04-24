@@ -13,11 +13,16 @@ import (
 
 func GetNotes(c *gin.Context) {
 	// taken user id from parameters
-	user_id := c.Param("user_id")
+	userId, exists := c.Get("userID")
 
-	fmt.Println("User ID from query:", user_id)
+	if !exists {
+		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
+		return
+	}
+
+	fmt.Println("User ID from query:", userId)
 	// convert string to ObjectID
-	objectID, err := primitive.ObjectIDFromHex(user_id)
+	objectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
@@ -46,10 +51,15 @@ func GetNotes(c *gin.Context) {
 
 func CreateNote(c *gin.Context) {
 	// taken user id from query parameters
-	user_id := c.Param("user_id")
+	userId, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
+		return
+	}
 
 	// convert string to ObjectID
-	objectID, err := primitive.ObjectIDFromHex(user_id)
+	objectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
@@ -97,10 +107,15 @@ func DeleteNote(c *gin.Context) {
 	defer cancel()
 	// taken user id and note id from query parameters
 	note_id := c.Param("note_id")
-	user_id := c.Param("user_id")
+	userId, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
+		return
+	}
 
 	// convert string to ObjectID
-	userObjectID, err := primitive.ObjectIDFromHex(user_id)
+	userObjectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
@@ -141,16 +156,22 @@ func UpdateNote(c *gin.Context) {
 	defer cancel()
 	// taken user id and note id from query parameters
 	note_id := c.Param("note_id")
-	user_id := c.Param("user_id")
+	userId, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(500, gin.H{"error": "Failed to get user ID from context"})
+		return
+	}
+
 	// convert string to ObjectID
-	fmt.Println("userid :", user_id)
+	fmt.Println("userid :", userId)
 	noteObjectID, err := primitive.ObjectIDFromHex(note_id)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid note ID"})
 		return
 	}
 	fmt.Println("note object ID:", noteObjectID)
-	userObjectID, err := primitive.ObjectIDFromHex(user_id)
+	userObjectID, err := primitive.ObjectIDFromHex(userId.(string))
 	if err != nil {
 		fmt.Println("")
 		c.JSON(400, gin.H{"error": "Invalid user ID"})
