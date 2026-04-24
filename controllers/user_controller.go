@@ -103,6 +103,11 @@ func LoginUser(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":  200,
 		"message": "Login successful",
+		"user": gin.H{
+			"id":    user.ID,
+			"email": user.Email,
+			"name":  user.Name,
+		},
 	})
 }
 
