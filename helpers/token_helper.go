@@ -15,7 +15,7 @@ type Claims struct {
 func GenerateJWT(userID string) (string, error) {
 
 	JWT_SECRET := os.Getenv("JWT_SECRET")
-	var jwtKey = []byte(os.Getenv(JWT_SECRET))
+	var jwtKey = []byte(JWT_SECRET)
 	claims := &Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -34,7 +34,7 @@ func GenerateJWT(userID string) (string, error) {
 
 func ValidateJWT(tokenString string) (*Claims, error) {
 	JWT_SECRET := os.Getenv("JWT_SECRET")
-	var jwtKey = []byte(os.Getenv(JWT_SECRET))
+	var jwtKey = []byte(JWT_SECRET)
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil

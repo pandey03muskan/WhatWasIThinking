@@ -3,8 +3,7 @@ package main
 import (
 	"TestProject/config"
 	"TestProject/routes"
-	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 func main() {
 	err := godotenv.Load() // load env variables from .env file
 	if err != nil {
-		fmt.Println("No .env file found, using environment variables")
+		slog.Warn("No .env file found, using environment variables")
 	}
 	config.MongoDB_Connection() // connected to manogoDB
 
@@ -41,8 +40,8 @@ func main() {
 	if PORT == "" {
 		PORT = "8080" // Default port if not specified in .env
 	}
-	log.Printf("Server is running on port %s", PORT) // Start the server
+	slog.Info("Server is running on port", "port", PORT) // Start the server
 	if err := router.Run(":" + PORT); err != nil {
-		log.Println("No port found")
+		slog.Error("No port found", "error", err)
 	}
 }

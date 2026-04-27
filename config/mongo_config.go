@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"os"
 	"time"
 
@@ -13,13 +13,13 @@ import (
 var MONGO_DB *mongo.Client
 
 func MongoDB_Connection() {
-	fmt.Println("we are in mongoDB connetion function")
+	slog.Info("we are in mongoDB connetion function")
 	MONGO_URI := os.Getenv("MONGO_URI")
-	fmt.Println("MongoDB URI:", MONGO_URI)
+	slog.Info("MongoDB URI", "uri", MONGO_URI)
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(MONGO_URI))
 	if err != nil {
-		fmt.Println("err while creating mongo client", err)
+		slog.Error("Error while creating mongo client", "error", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
@@ -27,25 +27,25 @@ func MongoDB_Connection() {
 
 	err = client.Connect(ctx)
 	if err != nil {
-		fmt.Println("error while connection :", err)
+		slog.Error("Error while connection", "error", err)
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		fmt.Println("error while ping to DB :", err)
+		slog.Error("Error while pinging DB", "error", err)
 	}
 
-	fmt.Println("Connected to MongoDB!")
+	slog.Info("Connected to MongoDB!")
 	MONGO_DB = client
 }
 
 func GetCollection(collectionName string) *mongo.Collection {
 	DB_NAME := os.Getenv("DB_NAME")
 	if DB_NAME == "" {
-		fmt.Println("DB_NAME is not set in environment variables")
+		slog.Error("DB_NAME is not set in environment variables")
 		return nil
 	}
 	collection := MONGO_DB.Database(DB_NAME).Collection(collectionName)
-	fmt.Println("collection name is ", collectionName)
+	slog.Info("collection name is", "collectionName", collectionName)
 	return collection
 }

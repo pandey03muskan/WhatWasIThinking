@@ -11,13 +11,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		// get the token from the header
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" {
-			c.JSON(401, gin.H{"error": "Authorization header is required"})
+			helpers.ErrorResponse(c, 401, "Authorization header is required")
 			c.Abort()
 			return
 		}
 		claims, err := helpers.ValidateJWT(tokenString)
 		if err != nil {
-			c.JSON(401, gin.H{"error": "Invalid token"})
+			helpers.ErrorResponse(c, 401, "Invalid token")
 			c.Abort()
 			return
 		}
